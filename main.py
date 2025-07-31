@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from database import engine, Base, SessionLocal
 from models import Student
@@ -7,6 +8,16 @@ from auth import hash_password, verify_password, create_access_token
 from utils import generate_student_code
 
 app = FastAPI()
+
+origins = ["http://localhost:5173"]  
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  
+)
+
 Base.metadata.create_all(bind=engine)
 
 def get_db():
@@ -43,12 +54,15 @@ def register(data: RegisterSchema, db: Session = Depends(get_db)):
     db.refresh(new_student)
 
     token = create_access_token({"sub": new_student.phone})
-    return {"token": token, "student": {
-        "name": new_student.name,
-        "student_code": new_student.student_code,
-        "phone": new_student.phone,
-        "lang": new_student.lang
-    }}
+    return {
+        "token": token,
+        "student": {
+            "name": new_student.name,
+            "student_code": new_student.student_code,
+            "phone": new_student.phone,
+            "lang": new_student.lang
+        }
+    }
 
 @app.post("/login")
 def login(data: LoginSchema, db: Session = Depends(get_db)):
@@ -61,9 +75,12 @@ def login(data: LoginSchema, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Invalid credentials")
 
     token = create_access_token({"sub": student.phone})
-    return {"token": token, "student": {
-        "name": student.name,
-        "student_code": student.student_code,
-        "phone": student.phone,
-        "lang": student.lang
-    }}
+    return {
+        "token": token,
+        "student": {
+            "name": student.name,
+            "student_code": student.student_code,
+            "phone": student.phone,
+            "lang": student.lang
+        }
+    }
