@@ -16,7 +16,7 @@ from utils import generate_student_code
 
 app = FastAPI()
 
-origins = ["http://localhost:5173"]  
+origins = ["http://localhost:5173", "https://easybio2025.netlify.app"]  
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
