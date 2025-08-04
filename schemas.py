@@ -7,9 +7,13 @@ class RegisterSchema(BaseModel):
     city: str
     grade: str
     lang: str
+    email: str
     password: str
     confirm_password: str
 
 class LoginSchema(BaseModel):
     identifier: str
     password: str
+
+class RefreshSchema(BaseModel):
+    refresh_token: str
